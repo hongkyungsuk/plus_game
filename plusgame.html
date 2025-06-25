@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>🧮 더하기 빨리 계산하기!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Do Hyeon', sans-serif;
+      background: #f7f7fa;
+      color: #222;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #app {
+      width: 100vw;
+      height: 100vh;
+      max-width: 430px;
+      max-height: 920px;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 0 16px #0002;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      aspect-ratio: 9/16;
+      min-height: 100vh;
+    }
+    .centered {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      position: relative;
+    }
+    .start-hero {
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle at 60% 40%, #4f8cff 60%, #a0e9ff 100%);
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto 18px auto;
+      box-shadow: 0 8px 32px #4f8cff33;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: hero-pop 1.2s cubic-bezier(.7,-0.2,.3,1.4);
+    }
+    .abacus-emoji {
+      font-size: 3.2rem;
+      margin-bottom: 0.2em;
+      display: block;
+      filter: drop-shadow(0 2px 8px #fff8);
+    }
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+      width: 100%;
+      margin-bottom: 1.1rem;
+    }
+    .title-text {
+      font-size: 2.3rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #3a7bd5;
+      text-shadow: 0 4px 16px #3a7bd533, 0 1px 0 #fff;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .clock-emoji {
+      font-size: 2.3rem;
+      filter: drop-shadow(0 2px 8px #fff8);
+      animation: clock-tick 1.2s infinite alternate;
+      margin-left: 0.2em;
+      vertical-align: middle;
+    }
+    .desc-card {
+      background: #f3f8ff;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px #4f8cff11;
+      padding: 1.1em 1.2em 1.1em 1.2em;
+      margin-bottom: 2.2em;
+      font-size: 1.08rem;
+      color: #234;
+      text-align: center;
+      line-height: 1.7;
+      border: 1.5px solid #e0eaff;
+      position: relative;
+      z-index: 2;
+      max-width: 95vw;
+      width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 500;
+      word-break: keep-all;
+      white-space: normal;
+    }
+    .btn {
+      background: linear-gradient(90deg, #4f8cff 60%, #00e0ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 1.1em 2.8em;
+      font-size: 1.35rem;
+      margin: 1.2em 0 0 0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      font-family: inherit;
+      box-shadow: 0 4px 16px #4f8cff33, 0 1.5px 0 #fff;
+      font-weight: bold;
+      letter-spacing: 1px;
+      display: block;
+      width: 90%;
+      max-width: 320px;
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .btn:active {
+      background: linear-gradient(90deg, #3466b3 60%, #00b0b0 100%);
+      transform: scale(0.97);
+    }
+    .timer-bar {
+      width: 90%;
+      height: 16px;
+      background: #e0e0e0;
+      border-radius: 8px;
+      margin: 1.2em auto 0.7em auto;
+      overflow: hidden;
+      position: relative;
+    }
+    .timer-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, #4f8cff, #00e0ff);
+      width: 100%;
+      transition: width 0.1s linear;
+    }
+    .quiz {
+      font-size: 2.1rem;
+      margin: 1.2em 0 0.7em 0;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .input-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.2em;
+    }
+    .num-input {
+      font-size: 2rem;
+      width: 120px;
+      text-align: center;
+      border: 2px solid #4f8cff;
+      border-radius: 8px;
+      padding: 0.3em 0.2em;
+      outline: none;
+      margin-right: 0.7em;
+    }
+    .streak {
+      font-size: 1.1rem;
+      color: #4f8cff;
+      margin-bottom: 0.7em;
+      font-weight: bold;
+    }
+    .result-msg {
+      font-size: 2rem;
+      margin: 1.2em 0 0.7em 0;
+      font-weight: bold;
+      text-align: center;
+    }
+    .fail-anim {
+      position: absolute;
+      left: -120px;
+      top: 40%;
+      width: 100px;
+      height: 100px;
+      z-index: 10;
+      pointer-events: none;
+      animation: fail-fly 4s linear forwards;
+    }
+    @keyframes fail-fly {
+      0% { left: -120px; opacity: 1; }
+      80% { left: 80vw; opacity: 1; }
+      100% { left: 100vw; opacity: 0; }
+    }
+    .coupon {
+      background: #fffbe7;
+      border: 2px dashed #ffb300;
+      border-radius: 18px;
+      padding: 2em 1em;
+      margin: 2em 0 1em 0;
+      text-align: center;
+      box-shadow: 0 2px 12px #ffb30022;
+      font-size: 1.3rem;
+      position: relative;
+    }
+    .coupon-emoji {
+      font-size: 2.5rem;
+      margin-bottom: 0.5em;
+      display: block;
+    }
+    .firework {
+      position: absolute;
+      left: 50%;
+      top: 30%;
+      width: 120px;
+      height: 120px;
+      pointer-events: none;
+      z-index: 20;
+      animation: firework 1.2s ease-out;
+    }
+    @keyframes firework {
+      0% { opacity: 0; transform: scale(0.2) translate(-50%, -50%); }
+      40% { opacity: 1; transform: scale(1.2) translate(-50%, -50%); }
+      100% { opacity: 0; transform: scale(1.8) translate(-50%, -50%); }
+    }
+    @media (max-width: 500px) {
+      #app {
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <audio id="audio-success" src="assets/Ascending 3.mp3" preload="auto"></audio>
+  <audio id="audio-fail" src="assets/fail_01.mp3" preload="auto"></audio>
+  <audio id="audio-coupon" src="assets/suc_01.mp3" preload="auto"></audio>
+  <img id="fail-img" src="assets/ggg.png" style="display:none;" />
+  <canvas id="coupon-canvas" width="400" height="200" style="display:none;"></canvas>
+  <script>
+    // 상태
+    let state = {
+      screen: 'start', // start | quiz | result | fail | coupon
+      quiz: null,
+      answer: '',
+      streak: 0,
+      timer: 5,
+      timerId: null,
+      failAnim: false,
+      firework: false,
+      couponImgUrl: '',
+    };
+
+    // 문제 생성
+    function makeQuiz() {
+      const a = Math.floor(Math.random() * 41) + 10;
+      const b = Math.floor(Math.random() * 41) + 10;
+      return { a, b, sum: a + b };
+    }
+
+    // 효과음
+    function playAudio(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.currentTime = 0;
+        const p = el.play();
+        if (p && typeof p.catch === 'function') p.catch(()=>{});
+      }
+    }
+
+    // 화면 렌더링
+    function render() {
+      const app = document.getElementById('app');
+      app.innerHTML = '';
+      if (state.screen === 'start') renderStart(app);
+      else if (state.screen === 'quiz') renderQuiz(app);
+      else if (state.screen === 'result') renderResult(app);
+      else if (state.screen === 'fail') renderFail(app);
+      else if (state.screen === 'coupon') renderCoupon(app);
+    }
+
+    // 시작 화면
+    function renderStart(app) {
+      app.innerHTML = `
+        <div class="centered">
+          <div class="start-hero">
+            <span class="abacus-emoji">🧮</span>
+          </div>
+          <div class="title">
+            더하기 빨리 계산하기!
+            <span class="clock-emoji">⏰</span>
+          </div>
+          <div class="desc-card">
+            <div style="font-size:1.13em; font-weight:600; margin-bottom:0.4em;">5초 안에 문제를 풀고 정답을 입력하세요!</div>
+            <div style="font-size:1.08em; margin-bottom:0.4em;">3문제 연속 정답 시 <b style='color:#ffb300;'>음료수 쿠폰</b>이 지급됩니다!</div>
+            <div style="font-size:1em;">준비되면 <b style='color:#4f8cff;'>시작 버튼</b>을 눌러주세요!</div>
+          </div>
+          <button class="btn" onclick="startGame()">시작하기 ▶️</button>
+        </div>
+      `;
+    }
+
+    // 퀴즈 화면
+    function renderQuiz(app) {
+      app.innerHTML = `
+        <div class="streak">연속 정답: ${state.streak}/3</div>
+        <div class="timer-bar"><div class="timer-bar-inner" id="timer-bar-inner" style="width:100%"></div></div>
+        <div class="quiz">${state.quiz.a} + ${state.quiz.b} = ?</div>
+        <div class="input-row">
+          <input class="num-input" id="answer-input" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="3" autofocus />
+          <button class="btn" onclick="submitAnswer()">확인</button>
+        </div>
+      `;
+      setTimeout(() => {
+        document.getElementById('answer-input').focus();
+      }, 100);
+      startTimer();
+    }
+
+    // 타이머
+    function startTimer() {
+      clearInterval(state.timerId);
+      state.timer = 5;
+      const bar = document.getElementById('timer-bar-inner');
+      state.timerId = setInterval(() => {
+        state.timer -= 0.1;
+        if (bar) bar.style.width = (state.timer / 5 * 100) + '%';
+        if (state.timer <= 0) {
+          clearInterval(state.timerId);
+          failQuiz();
+        }
+      }, 100);
+    }
+
+    // 정답 제출
+    function submitAnswer() {
+      const input = document.getElementById('answer-input');
+      if (!input) return;
+      const val = input.value.trim();
+      if (val === '') return;
+      clearInterval(state.timerId);
+      if (parseInt(val) === state.quiz.sum) {
+        state.streak++;
+        if (state.streak >= 3) {
+          state.screen = 'coupon';
+          setTimeout(() => {
+            playAudio('audio-coupon');
+            state.firework = true;
+            render();
+            setTimeout(() => { state.firework = false; render(); }, 1200);
+          }, 200);
+        } else {
+          state.screen = 'result';
+          setTimeout(() => {
+            playAudio('audio-success');
+            render();
+            setTimeout(() => { nextQuiz(); }, 1000);
+          }, 200);
+        }
+      } else {
+        failQuiz();
+      }
+      render();
+    }
+
+    // 실패 처리
+    function failQuiz() {
+      state.streak = 0;
+      state.screen = 'fail';
+      state.failAnim = true;
+      setTimeout(() => {
+        playAudio('audio-fail');
+        render();
+        setTimeout(() => {
+          state.failAnim = false;
+          nextQuiz();
+        }, 1200);
+      }, 200);
+      render();
+    }
+
+    // 다음 문제
+    function nextQuiz() {
+      state.quiz = makeQuiz();
+      state.answer = '';
+      state.screen = 'quiz';
+      render();
+    }
+
+    // 정답 화면
+    function renderResult(app) {
+      app.innerHTML = `
+        <div class="result-msg">🎯 정답입니다!</div>
+      `;
+    }
+
+    // 실패 화면
+    function renderFail(app) {
+      app.innerHTML = `
+        <div class="result-msg">❌ 오답 또는 시간 초과!</div>
+        <button class="btn" onclick="nextQuiz()">다시 하기 🔁</button>
+        <button class="btn" onclick="goHome()">홈으로 🏠</button>
+      `;
+      if (state.failAnim) showFailAnim();
+    }
+
+    // 실패 애니메이션
+    function showFailAnim() {
+      const app = document.getElementById('app');
+      const img = document.getElementById('fail-img');
+      if (!img) return;
+      const anim = document.createElement('img');
+      anim.src = img.src;
+      anim.className = 'fail-anim';
+      app.appendChild(anim);
+      setTimeout(() => { anim.remove(); }, 4000);
+    }
+
+    // 쿠폰 화면
+    function renderCoupon(app) {
+      app.innerHTML = `
+        <div class="result-msg">🎉 축하합니다! 3문제를 연속 정답하셨어요!</div>
+        <div class="coupon" id="coupon-area">
+          <span class="coupon-emoji">🥤</span>
+          <div>음료수 1잔 무료 쿠폰</div>
+        </div>
+        <button class="btn" onclick="saveCoupon()">쿠폰 저장하기 💾</button>
+        <button class="btn" onclick="goHome()">홈으로 🏠</button>
+      `;
+      if (state.firework) showFirework();
+    }
+
+    // 축포 애니메이션
+    function showFirework() {
+      const app = document.getElementById('app');
+      const fire = document.createElement('img');
+      fire.src = 'https://cdn.pixabay.com/photo/2013/07/12/15/55/firework-150634_1280.png';
+      fire.className = 'firework';
+      fire.style.left = '50%';
+      fire.style.top = '30%';
+      fire.style.transform = 'translate(-50%, -50%)';
+      app.appendChild(fire);
+      setTimeout(() => { fire.remove(); }, 1200);
+    }
+
+    // 쿠폰 저장
+    function saveCoupon() {
+      const canvas = document.getElementById('coupon-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,400,200);
+      ctx.fillStyle = '#fffbe7';
+      ctx.fillRect(0,0,400,200);
+      ctx.strokeStyle = '#ffb300';
+      ctx.setLineDash([8,8]);
+      ctx.lineWidth = 4;
+      ctx.strokeRect(10,10,380,180);
+      ctx.setLineDash([]);
+      ctx.font = 'bold 32px Do Hyeon, sans-serif';
+      ctx.fillStyle = '#ffb300';
+      ctx.textAlign = 'center';
+      ctx.fillText('🥤 음료수 1잔 무료 쿠폰', 200, 110);
+      ctx.font = '20px Do Hyeon, sans-serif';
+      ctx.fillStyle = '#333';
+      ctx.fillText('더하기 빨리 계산하기!', 200, 60);
+      ctx.fillText('축하합니다! 3연속 정답!', 200, 160);
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'plusgame_coupon.png';
+      a.click();
+    }
+
+    // 홈으로
+    function goHome() {
+      state.screen = 'start';
+      state.streak = 0;
+      render();
+    }
+
+    // 게임 시작
+    function startGame() {
+      // 오디오 깨우기 (브라우저 정책 대응)
+      ['audio-success','audio-fail','audio-coupon'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.muted = false;
+          try {
+            el.play().then(()=>{el.pause(); el.currentTime=0;});
+          } catch(e) {}
+        }
+      });
+      state.streak = 0;
+      state.quiz = makeQuiz();
+      state.screen = 'quiz';
+      render();
+    }
+
+    // 최초 렌더링
+    render();
+    // 모바일 키패드용 엔터 제출
+    window.submitAnswer = submitAnswer;
+    window.nextQuiz = nextQuiz;
+    window.goHome = goHome;
+    window.startGame = startGame;
+    window.saveCoupon = saveCoupon;
+  </script>
+</body>
+</html> 
